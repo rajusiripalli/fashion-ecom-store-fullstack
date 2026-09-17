@@ -6,7 +6,7 @@ interface SectionHeaderProps {
 
 export default function SectionHeader({title, subTitle}:SectionHeaderProps) {
   return (
-    <div className="mx-auto text-center max-w-2xl py-8 sm:py-14">
+    <div className="mx-auto text-center max-w-2xl py-8">
         <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             {title}
         </h2>

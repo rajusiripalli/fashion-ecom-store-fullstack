@@ -1,3 +1,5 @@
+
+
 export const dummyLatestCollections = [
     {
         id: 1,
@@ -28,5 +30,38 @@ export const dummyLatestCollections = [
         name: "Modern Trousers",
         image: "/images/product5.png",
         price: 119.99,
+    }
+]
+
+export const dummyBestSellers = [
+    {
+        id: 6,
+        name: "Essential Cotton T-Shirt",
+        image: "/images/product6.png",
+        price: 29.99
+    },
+    {
+        id: 7, 
+        name: "Jean Jacket",
+        image: "/images/product7.webp",
+        price: 49.99,
+    },
+    {
+        id: 8,
+        name: "Relaxed Fit Cargo Pants",
+        image: "/images/product8.png",
+        price: 64.99,
+    },
+    {
+        id: 9,
+        name: "Classic Puma Top",
+        image: "/images/product9.png",
+        price: 54.99,
+    },
+    {
+        id: 10,
+        name: "Tailored Mens Sleeve",
+        image: "/images/product10.png",
+        price: 49.99,
     }
 ]
