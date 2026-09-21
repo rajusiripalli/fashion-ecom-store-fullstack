@@ -14,8 +14,56 @@ export default function FilterOptions() {
             <RiArrowRightDoubleFill 
                 className={`transition-transform duration-300 sm:hidden ${showFilter ? "rotate-90": ""}`}
             />
-
         </button>
+
+        {/* Filters */}
+        <div className={`space-y-6 sm:block ${showFilter ? "block": "hidden"}`}>
+            {/* Categories */}
+            <div className="rounded-xl border border-border p-5">
+               <h3 className="mb-4 text-sm font-semibold tracking-wide">
+                    CATEGORIES
+                </h3>
+                <div className="space-y-3 text-sm text-muted-foreground">
+                    <label className="flex items-center gap-3">
+                        <input type="checkbox" />
+                        <span>Men</span>
+                    </label>
+                       <label className="flex items-center gap-3">
+                        <input type="checkbox" />
+                        <span>Women</span>
+                    </label>
+                       <label className="flex items-center gap-3">
+                        <input type="checkbox" />
+                        <span>Children</span>
+                    </label>
+                </div>
+            </div>
+
+            {/* Product Types */}
+            <div className="rounded-xl border border-border p-5">
+                    <h3 className="mb-4 text-sm font-semibold tracking-wide">
+            PRODUCT TYPE
+          </h3>
+
+                <div className="space-y-3 text-sm text-muted-foreground">
+                      <label className="flex items-center gap-3">
+                        <input type="checkbox" />
+                        <span>Trousers</span>
+                    </label>
+                      <label className="flex items-center gap-3">
+                        <input type="checkbox" />
+                        <span>Shirts</span>
+                    </label>
+                      <label className="flex items-center gap-3">
+                        <input type="checkbox" />
+                        <span>Hoodies</span>
+                    </label>
+                </div>
+
+            </div>
+
+        </div>
+
     </aside>
   )
 }
