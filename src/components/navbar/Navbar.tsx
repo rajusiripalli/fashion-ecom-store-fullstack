@@ -60,7 +60,7 @@ export default function Navbar() {
               <IoSearch size={22} />
             </button>
             {/* user */}
-            <button onClick={() => router.push("/sign-in")} className="rounded-full p-2 text-foreground transition-colors hover:bg-surface">
+            <button onClick={() => router.push("/signin")} className="rounded-full p-2 text-foreground transition-colors hover:bg-surface">
               <FaRegUser size={22} />
             </button>
             {/* cart badge */}
@@ -85,7 +85,7 @@ export default function Navbar() {
                 </Link>
               );
             })}
-            <button onClick={() => router.push("/sign-in")} className="mt-4 rounded-lg bg-primary py-3 text-sm font-medium text-primary-foreground transition hover:bg-primary-hover">
+            <button onClick={() => router.push("/signin")} className="mt-4 rounded-lg bg-primary py-3 text-sm font-medium text-primary-foreground transition hover:bg-primary-hover">
                 Sign In
             </button>
           </div>
