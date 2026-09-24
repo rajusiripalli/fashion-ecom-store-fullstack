@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchStore } from "@/store/search-store";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -15,6 +16,7 @@ const navLinks = [
 ];
 
 export default function Navbar() {
+  const {openSearch } = useSearchStore();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
@@ -56,7 +58,7 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2">
             {/* search */}
-            <button className="rounded-full p-2 text-foreground transition-colors hover:bg-surface">
+            <button onClick={() => openSearch()} className="rounded-full p-2 text-foreground transition-colors hover:bg-surface">
               <IoSearch size={22} />
             </button>
             {/* user */}

@@ -2,8 +2,10 @@ import FrontendLayout from "@/components/layouts/FrontendLayout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import Button from "@/components/ui/Button";
 import OrderStatusBadge from "@/components/ui/OrderStatusBadge";
+import Image from "next/image";
 import Link from "next/link";
-import { FiArrowLeft } from "react-icons/fi";
+import { FaMoneyBillWave } from "react-icons/fa";
+import { FiArrowLeft, FiMapPin, FiPackage } from "react-icons/fi";
 
 const order = {
   id: "ORD-8FK2P9",
@@ -27,7 +29,7 @@ const order = {
     {
       id: 1,
       name: "Classic Denim Jacket",
-      image: "/image/product1.png",
+      image: "/images/product1.png",
       price: 79.99,
       quantity: 1,
       size: "M",
@@ -36,7 +38,7 @@ const order = {
     {
       id: "2",
       name: "Premium Hoodie",
-      image: "/image/product2.png",
+      image: "/images/product2.png",
       price: 59.99,
       quantity: 2,
       size: "L",
@@ -81,6 +83,159 @@ export default function OrderPage() {
         
             <OrderStatusBadge />
       
+        </div>
+
+         <div className="mt-10 grid gap-10 lg:grid-cols-[2fr_1fr]">
+          {/* LEFT */}
+          <div>
+            {/* Order Items */}
+            <div className="rounded-2xl border border-border p-6">
+              <div className="flex items-center gap-3">
+                <FiPackage className="text-primary" />
+
+                <h2 className="text-xl font-semibold">
+                  Ordered Items
+                </h2>
+              </div>
+
+              <div className="mt-8 space-y-6">
+                {order.items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex flex-col gap-5 rounded-xl border border-border p-5 sm:flex-row"
+                  >
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      width={130}
+                      height={160}
+                      className="rounded-xl object-cover"
+                    />
+
+                    <div className="flex flex-1 justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold">
+                          {item.name}
+                        </h3>
+
+                        <div className="mt-3 flex flex-wrap gap-2 text-sm">
+                          <span className="rounded-full bg-surface px-3 py-1">
+                            Size: {item.size}
+                          </span>
+
+                          <span className="rounded-full bg-surface px-3 py-1">
+                            Color: {item.color}
+                          </span>
+
+                          <span className="rounded-full bg-surface px-3 py-1">
+                            Qty: {item.quantity}
+                          </span>
+                        </div>
+                      </div>
+
+                      <p className="text-xl font-bold">
+                        $
+                        {(item.price * item.quantity).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+
+          {/* RIGHT */}
+          <aside className="space-y-6 lg:sticky lg:top-24 lg:h-fit">
+            {/* Summary */}
+            <div className="rounded-2xl border border-border p-6">
+              <h2 className="text-2xl font-bold">
+                Order Summary
+              </h2>
+
+              <div className="mt-8 space-y-4">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span>${order.subtotal.toFixed(2)}</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Shipping</span>
+                  <span>Free</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Tax</span>
+                  <span>${order.tax.toFixed(2)}</span>
+                </div>
+
+                <div className="flex justify-between border-t border-border pt-4 text-xl font-bold">
+                  <span>Total</span>
+                  <span>${order.total.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Shipping */}
+            <div className="rounded-2xl border border-border p-6">
+              <div className="flex items-center gap-3">
+                <FiMapPin className="text-primary" />
+
+                <h2 className="text-xl font-semibold">
+                  Shipping Address
+                </h2>
+              </div>
+
+              <div className="mt-5 space-y-2 text-muted-foreground">
+                <p className="font-medium text-foreground">
+                  {"order.address.firstName"} {order.address.lastName}
+                </p>
+
+                <p>{"order.address.phone"}</p>
+
+                <p>{"order.address.street"}</p>
+
+                <p>
+                  {"order.address.city"}, {"order.address.state"}
+                </p>
+
+                <p>{"order.address.country"}</p>
+              </div>
+            </div>
+
+            {/* Payment */}
+            <div className="rounded-2xl border border-border p-6">
+              <div className="flex items-center gap-3">
+                <FaMoneyBillWave className="text-primary" />
+
+                <h2 className="text-xl font-semibold">
+                  Payment
+                </h2>
+              </div>
+
+              <div className="mt-5 space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Method
+                  </p>
+
+                  <p className="font-semibold">
+                    {"order.paymentMethod"}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Payment Status
+                  </p>
+
+                  <span className={`rounded-full  px-3 py-1 text-sm font-medium  ${true  ? "text-green-600 bg-green-100" : "text-yellow-700 bg-yellow-100"}`}>
+                    {"order.paymentStatus"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
 
         </section>
