@@ -89,7 +89,7 @@ export default function SigninPage() {
           <p className="mt-8 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link
-              href="/signin"
+              href="/signup"
               className="font-semibold text-primary hover:underline"
             >
               Create Account

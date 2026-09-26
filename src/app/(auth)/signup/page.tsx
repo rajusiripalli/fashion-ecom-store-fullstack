@@ -8,6 +8,9 @@ import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { authClient } from "@/lib/auth-client";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 
 const signupSchema = z.object({
@@ -20,6 +23,8 @@ type SignUpFormValues = z.infer<typeof signupSchema>
 
 
 export default function SignupPage() {
+    const router = useRouter();
+
     const {register, handleSubmit, formState: {errors, isSubmitting}} = useForm<SignUpFormValues>({
         resolver: zodResolver(signupSchema),
         defaultValues: {
@@ -29,7 +34,21 @@ export default function SignupPage() {
         }
     })
   const onSubmit = async (data: SignUpFormValues) => {
-        console.log(data);
+        const {error} = await authClient.signUp.email({
+          name: data.name,
+          email: data.email,
+          password: data.password
+        })
+
+        console.log("Error --->", error);
+
+        if(error){
+          toast.error(error.message as string);
+          return
+        }
+
+        toast.success("Registration Successful");
+        router.replace("/account");
   }
 
 
@@ -57,7 +76,7 @@ export default function SignupPage() {
               type="text"
               placeholder="John Doe"
              error={errors.name?.message}
-            {...register("name")}
+             {...register("name")}
             />
 
             <Input
