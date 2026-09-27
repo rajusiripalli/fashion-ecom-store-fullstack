@@ -40,7 +40,6 @@ export default function SignupPage() {
           password: data.password
         })
 
-        console.log("Error --->", error);
 
         if(error){
           toast.error(error.message as string);

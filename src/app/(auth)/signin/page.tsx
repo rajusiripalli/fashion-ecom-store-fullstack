@@ -8,6 +8,9 @@ import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { authClient } from "@/lib/auth-client";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 
 const signupSchema = z.object({
@@ -19,6 +22,7 @@ type SignInFormValues = z.infer<typeof signupSchema>
 
 
 export default function SigninPage() {
+    const router = useRouter()
     const {register, handleSubmit, formState: {errors, isSubmitting}} = useForm<SignInFormValues>({
         resolver: zodResolver(signupSchema),
         defaultValues: {
@@ -27,8 +31,22 @@ export default function SigninPage() {
         }
 })
 
-  const onSubmit = async (data: SignInFormValues) => {
-        console.log(data);
+   const onSubmit = async (data: SignInFormValues) => {
+
+        const {error} = await authClient.signIn.email({
+          email: data.email,
+          password: data.password
+        })
+
+        console.log("error ---->", error)
+
+        if(error){
+          toast.error(error.message as string);
+          return
+        }
+
+        toast.success("Login Successful");
+        router.replace("/account");
   }
 
 
