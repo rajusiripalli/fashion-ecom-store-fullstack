@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { signInWithGoogle } from "@/services/signInWithGoogle";
 
 
 const signupSchema = z.object({
@@ -29,7 +30,7 @@ export default function SigninPage() {
             email: "",
             password: ""
         }
-})
+    })
 
    const onSubmit = async (data: SignInFormValues) => {
 
@@ -38,7 +39,7 @@ export default function SigninPage() {
           password: data.password
         })
 
-        console.log("error ---->", error)
+        
 
         if(error){
           toast.error(error.message as string);
@@ -93,7 +94,7 @@ export default function SigninPage() {
             </Button>
 
             <Button
-              //onClick={signInWithGoogle}
+              onClick={signInWithGoogle}
               fullWidth
               type="button"
               variant="outline"
