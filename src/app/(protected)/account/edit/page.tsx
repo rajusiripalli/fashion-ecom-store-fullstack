@@ -1,12 +1,18 @@
 import FrontendLayout from "@/components/layouts/FrontendLayout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import EditProfileForm from "@/components/user/EditProfileForm";
+import { getProfile } from "@/server-actions/user/getProfile";
 
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function EditProfilePage() {
+  const user = await getProfile();
+
+  if (!user) {
+    redirect("/signin");
+  }
  
   return (
     <FrontendLayout>
@@ -30,7 +36,8 @@ export default async function EditProfilePage() {
             Edit your profile.
           </p>
 
-        <EditProfileForm />
+       
+        <EditProfileForm user={user} />
       </section>
     </FrontendLayout>
   );

@@ -7,38 +7,36 @@ import { FiX } from "react-icons/fi";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { useForm } from "react-hook-form";
-//import toast from "react-hot-toast";
-//import { Category, ProductType, Size } from "@/generated/prisma/enums";
+import toast from "react-hot-toast";
+import { Category, ProductType, Size } from "@/generated/prisma/enums";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-// const availableSizes: Size[] = [
-//   Size.XS,
-//   Size.S,
-//   Size.M,
-//   Size.L,
-//   Size.XL,
-//   Size.XXL,
-// ];
-const availableSizes = ["S", "M", "L", "XL", "XXL"];
+const availableSizes: Size[] = [
+  Size.XS,
+  Size.S,
+  Size.M,
+  Size.L,
+  Size.XL,
+  Size.XXL,
+];
 
+const productTypes: ProductType[] = [
+  ProductType.HOODIES,
+  ProductType.JACKETS,
+  ProductType.JEANS,
+  ProductType.SHIRTS,
+  ProductType.SHORTS,
+  ProductType.TROUSERS,
+  ProductType.T_SHIRTS,
+  ProductType.SHOES
+];
 
-// const productTypes: ProductType[] = [
-//   ProductType.HOODIES,
-//   ProductType.JACKETS,
-//   ProductType.JEANS,
-//   ProductType.SHIRTS,
-//   ProductType.SHORTS,
-//   ProductType.TROUSERS,
-//   ProductType.T_SHIRTS,
-//   ProductType.SHOES
-// ];
-
-// const categories: Category[] = [
-//   Category.MEN,
-//   Category.WOMEN,
-//   Category.CHILDREN,
-// ];
+const categories: Category[] = [
+  Category.MEN,
+  Category.WOMEN,
+  Category.CHILDREN,
+];
 
 const availableColors = [
   { name: "Black", value: "#000000" },
@@ -51,34 +49,34 @@ const availableColors = [
   { name: "Red", value: "#DC2626" },
 ];
 
-// type ProductFormValues = {
-//   name: string;
-//   description: string;
-//   price: number;
-//   stock: number;
-//   category: Category;
-//   productType: ProductType;
-// };
+type ProductFormValues = {
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: Category;
+  productType: ProductType;
+};
 
 export default function AddProductPage() {
   const router = useRouter();
-//   const {
-//     register,
-//     handleSubmit,
-//     reset,
-//     formState: { isSubmitting },
-//   } = useForm<ProductFormValues>({
-//     defaultValues: {
-//       name: "",
-//       description: "",
-//       price: 0,
-//       stock: 0,
-//       category: "MEN",
-//       productType: ProductType.T_SHIRTS,
-//     },
-//   });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = useForm<ProductFormValues>({
+    defaultValues: {
+      name: "",
+      description: "",
+      price: 0,
+      stock: 0,
+      category: "MEN",
+      productType: ProductType.T_SHIRTS,
+    },
+  });
   const [images, setImages] = useState<File[]>([]);
-  const [sizes, setSizes] = useState<string[]>([]);
+  const [sizes, setSizes] = useState<Size[]>([]);
   const [colors, setColors] = useState<string[]>([]);
   const [bestSeller, setBestSeller] = useState(false);
 
@@ -98,84 +96,84 @@ export default function AddProductPage() {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-//   const toggleSize = (size: Size) => {
-//     setSizes((prev) =>
-//       prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size],
-//     );
-//   };
+  const toggleSize = (size: Size) => {
+    setSizes((prev) =>
+      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size],
+    );
+  };
 
-//   const toggleColor = (color: string) => {
-//     setColors((prev) =>
-//       prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color],
-//     );
-//   };
+  const toggleColor = (color: string) => {
+    setColors((prev) =>
+      prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color],
+    );
+  };
 
-//   const handleCreateProduct = async (data: ProductFormValues) => {
-//     if (images.length === 0) {
-//       return toast.error("Please upload at least one image.");
-//     }
+  const handleCreateProduct = async (data: ProductFormValues) => {
+    if (images.length === 0) {
+      return toast.error("Please upload at least one image.");
+    }
 
-//     if (sizes.length === 0) {
-//       return toast.error("Please select at least one size.");
-//     }
+    if (sizes.length === 0) {
+      return toast.error("Please select at least one size.");
+    }
 
-//     if (colors.length === 0) {
-//       return toast.error("Please select at least one color.");
-//     }
+    if (colors.length === 0) {
+      return toast.error("Please select at least one color.");
+    }
 
-//     const selectedColors = availableColors.filter((color) =>
-//       colors.includes(color.name),
-//     );
+    const selectedColors = availableColors.filter((color) =>
+      colors.includes(color.name),
+    );
 
-//     const formData = new FormData();
+    const formData = new FormData();
 
-//     formData.append("name", data.name);
-//     formData.append("description", data.description);
-//     formData.append("price", data.price.toString());
-//     formData.append("category", data.category);
-//     formData.append("productType", data.productType);
-//     formData.append("bestSeller", String(bestSeller));
-//     formData.append("stock",data.stock.toString())
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("price", data.price.toString());
+    formData.append("category", data.category);
+    formData.append("productType", data.productType);
+    formData.append("bestSeller", String(bestSeller));
+    formData.append("stock",data.stock.toString())
 
-//     sizes.forEach((size) => {
-//       formData.append("sizes", size);
-//     });
+    sizes.forEach((size) => {
+      formData.append("sizes", size);
+    });
 
-//     selectedColors.forEach((color) => {
-//       formData.append("colors", JSON.stringify(color));
-//     });
+    selectedColors.forEach((color) => {
+      formData.append("colors", JSON.stringify(color));
+    });
 
-//     images.forEach((image) => {
-//       formData.append("images", image);
-//     });
+    images.forEach((image) => {
+      formData.append("images", image);
+    });
 
-//     try {
-//       const response = await fetch("/api/products", {
-//         method: "POST",
-//         body: formData,
-//       });
+    try {
+      const response = await fetch("/api/products", {
+        method: "POST",
+        body: formData,
+      });
 
-//       const result = await response.json();
+      const result = await response.json();
 
      
 
-//       if (!response.ok) {
-//         return toast.error(result.message);
-//       }
+      if (!response.ok) {
+        return toast.error(result.message);
+      }
 
-//       toast.success(result.message);
+      toast.success(result.message);
 
-//       reset();
-//       router.push("/admin/products");
-//     } catch (error) {
-//       console.error(error);
-//       toast.error("Something went wrong.");
-//     }
-//   };
+      reset();
+      router.push("/admin/products");
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong.");
+    }
+  };
 
   return (
     <form
-      //onSubmit={handleSubmit(handleCreateProduct)}
+      onSubmit={handleSubmit(handleCreateProduct)}
       className="mx-auto max-w-5xl space-y-8"
     >
       {/* Header */}
@@ -247,13 +245,13 @@ export default function AddProductPage() {
         <h2 className="text-lg font-semibold">Product Information</h2>
 
         <Input
-          //{...register("name")}
+          {...register("name")}
           label="Product Name"
           placeholder="Classic Black Hoodie"
         />
 
         <Input
-          //{...register("description")}
+          {...register("description")}
           label="Product Description"
           variant="textarea"
           placeholder="Write a detailed description..."
@@ -261,13 +259,13 @@ export default function AddProductPage() {
 
         <div className="grid gap-5 md:grid-cols-3">
           <Input
-            //{...register("price")}
+            {...register("price")}
             label="Price"            
             placeholder="79.99"
           />
 
           <Input
-            //{...register("stock")}
+            {...register("stock")}
             label="Stock Quantity"
             type="number"
             placeholder="50"
@@ -279,14 +277,14 @@ export default function AddProductPage() {
             <label className="mb-2 block text-sm font-medium">Category</label>
 
             <select
-              //{...register("category")}
+              {...register("category")}
               className="h-12 w-full rounded-lg border border-border bg-background px-4 outline-none transition focus:border-primary"
             >
-              {/* {categories.map((category) => (
+              {categories.map((category) => (
                 <option value={category} key={category}>
                   {category}
                 </option>
-              ))} */}
+              ))}
             </select>
           </div>
 
@@ -296,14 +294,14 @@ export default function AddProductPage() {
             </label>
 
             <select
-             // {...register("productType")}
+              {...register("productType")}
               className="h-12 w-full rounded-lg border border-border bg-background px-4 outline-none transition focus:border-primary"
             >
-              {/* {productTypes.map((productType) => (
+              {productTypes.map((productType) => (
                 <option value={productType} key={productType}>
                   {productType}
                 </option>
-              ))} */}
+              ))}
             </select>
           </div>
         </div>
@@ -321,7 +319,7 @@ export default function AddProductPage() {
               <button
                 key={size}
                 type="button"
-                //onClick={() => toggleSize(size)}
+                onClick={() => toggleSize(size)}
                 className={`h-11 w-16 rounded-lg border font-medium transition ${
                   selected
                     ? "border-primary bg-primary text-primary-foreground"
@@ -347,7 +345,7 @@ export default function AddProductPage() {
               <button
                 key={color.name}
                 type="button"
-               // onClick={() => toggleColor(color.name)}
+                onClick={() => toggleColor(color.name)}
                 className={`flex items-center gap-3 rounded-xl border px-4 py-3 transition ${
                   selected
                     ? "border-primary bg-primary/5"
@@ -388,8 +386,8 @@ export default function AddProductPage() {
 
       {/* Actions */}
       <div className="flex justify-end">
-        <Button>
-           Save Product
+        <Button disabled={isSubmitting}>
+          {isSubmitting ? "Saving Product..." : "Save Product"}
         </Button>
       </div>
     </form>

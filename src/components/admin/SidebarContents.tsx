@@ -1,4 +1,4 @@
-// import { logout } from "@/server-actions/auth/logout";
+import { logout } from "@/server-actions/auth/logout";
 import Link from "next/link";
 import { FiBox, FiHome, FiLogOut, FiPackage, FiShoppingBag } from "react-icons/fi";
 import { LuCirclePlus } from "react-icons/lu";
@@ -109,7 +109,7 @@ export function SidebarContent({
         </Link>
 
         <button
-          //onClick={logout}
+          onClick={logout}
           className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-destructive transition hover:bg-destructive/10"
         >
           <FiLogOut size={18} />

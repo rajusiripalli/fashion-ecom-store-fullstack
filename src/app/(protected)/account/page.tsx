@@ -6,10 +6,20 @@ import Button from "@/components/ui/Button";
 import { FaUser } from "react-icons/fa";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { redirect } from "next/navigation";
+import { logout } from "@/server-actions/auth/logout";
+import { getProfile } from "@/server-actions/user/getProfile";
 
 export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
+
+      const userProfile = await getProfile();
+
+      if(!userProfile){
+        redirect("/signin");
+      }
+
+      const address = userProfile.addresses[0];
 
 
   return (
@@ -38,30 +48,29 @@ export default async function AccountPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Full Name</p>
 
-                <p className="font-medium">{"Raju"}</p>
+                <p className="font-medium">{userProfile.name}</p>
               </div>
 
               <div>
                 <p className="text-sm text-muted-foreground">Email</p>
 
-                <p className="font-medium">{"loveappslab@gmail.com"}</p>
+                <p className="font-medium">{userProfile.email}</p>
               </div>
 
               <div>
                 <p className="text-sm text-muted-foreground">Phone</p>
 
-                <p className="font-medium">{"7794945385"}</p>
+                <p className="font-medium">{userProfile.phone ?? "Not Provided"}</p>
               </div>
 
               <div>
                 <p className="text-sm text-muted-foreground">Member Since</p>
 
                 <p className="font-medium">
-                  {" "}
-                  {/* {user.createdAt.toLocaleDateString("en-US", {
+                  {userProfile.createdAt.toLocaleDateString("en-US", {
                     month: "long",
                     year: "numeric",
-                  })} */}
+                  })}
                 </p>
               </div>
             </div>
@@ -81,7 +90,7 @@ export default async function AccountPage() {
               <Button
                 leftIcon={<FiLogOut />}
                 variant="outline"
-                //onClick={logout}
+                onClick={logout}
               >
                 Logout
               </Button>
@@ -89,7 +98,7 @@ export default async function AccountPage() {
           </div>
 
           {/* Address */}
-          {true ? (
+        {address ? (
             <div className="rounded-2xl border border-border p-6">
               <div className="mb-6 flex items-center gap-3">
                 <FiMapPin size={22} className="text-primary" />
@@ -98,22 +107,22 @@ export default async function AccountPage() {
               </div>
 
               <p>
-                {"address.firstName"} {"address.lastName"}
+                {address.firstName} {address.lastName}
               </p>
 
-              <p>{"address.street"}</p>
+              <p>{address.street}</p>
 
               <p>
-                {"address.city"}, {"address.state"}
+                {address.city}, {address.state}
               </p>
 
-              <p>{"address.country"}</p>
+              <p>{address.country}</p>
 
-              { <p>{"address.postalCode"}</p>}
+              {address.postalCode && <p>{address.postalCode}</p>}
 
-              <p>{"address.phone"}</p>
+              <p>{address.phone}</p>
             </div>
-          ) : (
+          )  : (
             <p className="text-muted-foreground">
               No shipping address added yet.
             </p>
