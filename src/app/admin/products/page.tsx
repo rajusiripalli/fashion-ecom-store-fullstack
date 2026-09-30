@@ -3,53 +3,13 @@ import Link from "next/link";
 import { FiPlus } from "react-icons/fi";
 
 import Button from "@/components/ui/Button";
-import { FaTrash, FaTrashAlt } from "react-icons/fa";
-//import { getProducts } from "@/server-actions/products/getProducts";
-//import DeleteProductButton from "@/components/admin/DeleteProductButton";
+import { getProducts } from "@/server-actions/products/getProducts";
+import DeleteProductButton from "@/components/admin/DeleteProductButton";
 
 export const dynamic = "force-dynamic";
 
-const products = [
-    {
-        id: 1,
-        name: "Classic Denim Jacket",
-        category: "Jackets",
-        price: 79.99,
-        stock: 18,
-        status: "Active",
-        image: "/images/product1.png",
-    },
-    {
-        id: 2,
-        name: "Premium Hoodie",
-        category: "Hoodies",
-        price: 59.99,
-        stock: 8,
-        status: "Active",
-        image: "/images/product2.png",
-    },
-    {
-        id: 3,
-        name: "Oversized T-Shirt",
-        category: "T-Shirts",
-        price: 34.99,
-        stock: 0,
-        status: "Out of Stock",
-        image: "/images/product3.png",
-    },
-    {
-        id: 4,
-        name: "Leather Sneakers",
-        category: "Shoes",
-        price: 99.99,
-        stock: 25,
-        status: "Active",
-        image: "/images/product4.png",
-    }
-]
-
 export default async function AdminProductsPage() {
-  //const products = await getProducts();
+  const products = await getProducts();
 
   return (
     <section>
@@ -109,8 +69,7 @@ export default async function AdminProductsPage() {
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-4">
                       <Image
-                        //src={product.images[0]?.imageUrl}
-                        src={product.image}
+                        src={product.images[0]?.imageUrl}
                         alt={product.name}
                         width={60}
                         height={70}
@@ -145,8 +104,7 @@ export default async function AdminProductsPage() {
 
                   <td className="px-6 py-5">
                     <div className="flex justify-end gap-2">
-                     {/* <DeleteProductButton productId={product.id} /> */}
-                     <FaTrashAlt className="text-destructive" />
+                     <DeleteProductButton productId={product.id} />
                     </div>
                   </td>
                 </tr>
