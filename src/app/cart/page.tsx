@@ -1,46 +1,34 @@
 "use client";
-
-import FrontendLayout from "@/components/layouts/FrontendLayout";
-import Breadcrumb from "@/components/ui/Breadcrumb";
-import Button from "@/components/ui/Button";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { FiMinus, FiPlus, FiTrash2 } from "react-icons/fi";
+
+import Button from "@/components/ui/Button";
+import FrontendLayout from "@/components/layouts/FrontendLayout";
+import { useRouter } from "next/navigation";
+import Breadcrumb from "@/components/ui/Breadcrumb";
+import { useCartStore } from "@/store/cart-store";
 import { IoBagHandleOutline } from "react-icons/io5";
 
-const cartItems = [
-    {
-        id: 1,
-        name: "Classic Denim Jacket",
-        image: "/images/product1.png",
-        price: 79.99,
-        quantity: 1,
-        size: "M",
-        color: "Charcoal",
-    },
-    {
-        id: 2,
-        name: "Premium Hoodie",
-        image: "/images/product2.png",
-        price: 59.99,
-        quantity: 2,
-        size: "L",
-        color: "Brown",
-    }
-]
-
-
 export default function CartPage() {
-    const router = useRouter();
-    const totalItems = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const router = useRouter();
+  const {
+    subtotal,
+    cartItems,
+    totalItems,
+    removeFromCart,
+    increaseQuantity,
+    decreaseQuantity,
+  } = useCartStore();
 
-    const shipping = 0;
-    const tax = subtotal * 0.08;
-    const total = subtotal + shipping + tax;
 
-   if (totalItems === 0) {
+  const shipping = 0;
+  const tax = subtotal() * 0.05;
+  const total = subtotal() + shipping + tax;
+
+ 
+
+  if (totalItems() === 0) {
     return (
       <FrontendLayout>
         <section className="mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center px-6 text-center">
@@ -63,9 +51,8 @@ export default function CartPage() {
     );
   }
 
-
   return (
-       <FrontendLayout>
+    <FrontendLayout>
       <section className="mx-auto max-w-6xl py-12">
         {/* Header */}
         <div>
@@ -74,7 +61,7 @@ export default function CartPage() {
           />
 
           <p className="mt-2 text-muted-foreground">
-            {totalItems} Item{totalItems !== 1 && "s"}  in your cart
+            {totalItems()} Item{totalItems() !== 1 && "s"} in your cart
           </p>
         </div>
 
@@ -83,7 +70,7 @@ export default function CartPage() {
           <div className="space-y-6">
             {cartItems.map((item) => (
               <div
-                //key={item.cartKey}
+                key={item.cartKey}
                 className="flex flex-col gap-5 rounded-2xl border border-border p-5 transition hover:shadow-sm sm:flex-row"
               >
                 {/* Product Image */}
@@ -122,7 +109,7 @@ export default function CartPage() {
                     {/* Quantity */}
                     <div className="flex items-center rounded-lg border border-border">
                       <button
-                        //onClick={() => decreaseQuantity(item.cartKey)}
+                        onClick={() => decreaseQuantity(item.cartKey)}
                         className="p-3 transition hover:bg-surface"
                       >
                         <FiMinus />
@@ -133,7 +120,7 @@ export default function CartPage() {
                       </span>
 
                       <button
-                        //onClick={() => increaseQuantity(item.cartKey)}
+                        onClick={() => increaseQuantity(item.cartKey)}
                         className="p-3 transition hover:bg-surface"
                       >
                         <FiPlus />
@@ -142,7 +129,7 @@ export default function CartPage() {
 
                     {/* Remove */}
                     <button
-                      //onClick={() => removeFromCart(item.cartKey)}
+                      onClick={() => removeFromCart(item.cartKey)}
                       className="flex items-center gap-2 text-destructive transition hover:opacity-80"
                     >
                       <FiTrash2 />
@@ -161,17 +148,17 @@ export default function CartPage() {
             <div className="mt-8 space-y-5">
               <div className="flex justify-between text-muted-foreground">
                 <span>Items</span>
-                <span>{totalItems}</span>
+                <span>{totalItems()}</span>
               </div>
 
               <div className="flex justify-between text-muted-foreground">
                 <span>Subtotal</span>
-                <span>${subtotal}</span>
+                <span>${subtotal().toFixed(2)}</span>
               </div>
 
               <div className="flex justify-between text-muted-foreground">
                 <span>Shipping</span>
-                <span>{ "Free" }</span>
+                <span>{shipping === 0 ? "Free" : `$${shipping}`}</span>
               </div>
 
               <div className="flex justify-between text-muted-foreground">
@@ -188,7 +175,7 @@ export default function CartPage() {
             </div>
 
             <Button
-              //onClick={() => Router.push("/checkout")}
+              onClick={() => router.push("/checkout")}
               fullWidth
               className="mt-8"
             >
@@ -212,5 +199,5 @@ export default function CartPage() {
         </div>
       </section>
     </FrontendLayout>
-  )
+  );
 }

@@ -7,37 +7,52 @@ import { IoBagAddOutline } from "react-icons/io5";
 
 import Button from "@/components/ui/Button";
 import Breadcrumb from "@/components/ui/Breadcrumb";
+import { getProduct } from "@/server-actions/products/getProduct";
+import { useCartStore } from "@/store/cart-store";
+import toast from "react-hot-toast";
 
+interface ProductPageComponentProps {
+  product: Awaited<ReturnType<typeof getProduct>>;
+}
 
+export default function ProductPageComponent({
+  product,
+}: ProductPageComponentProps) {
+  const { addToCart } = useCartStore();
+  const [selectedImage, setSelectedImage] = useState(
+    product?.images[0].imageUrl,
+  );
+  const [selectedSize, setSelectedSize] = useState(
+    product?.sizes[0]?.size ?? "",
+  );
+  const [selectedColor, setSelectedColor] = useState(
+    product?.colors[0] ?? null,
+  );
+  const isOutOfStock = (product?.stock ?? 0) <= 0;
 
-const images = [
-  "/images/gallery1.png",
-  "/images/gallery2.png",
-  "/images/gallery3.png",
-  "/images/gallery4.png",
-];
+  const handleAddToCart = () => {
+    if ((product?.stock ?? 0) <= 0) {
+      return toast.error("This product is out of stock.");
+    }
+    if (!product || !selectedColor || !selectedImage) {
+      return toast.error("Please select a size and color.");
+    }
 
-const sizes = ["S", "M", "L", "XL"];
+    const cartKey = `${product.id}-${selectedSize}-${selectedColor.id}`;
 
-const colors = [
-  {
-    name: "Charcoal",
-    value: "#1F2937",
-  },
-  {
-    name: "Brown",
-    value: "#8B5E3C",
-  },
-  {
-    name: "Light Gray",
-    value: "#E5E7EB",
-  },
-];
+    addToCart({
+      cartKey,
+      productId: product.id,
+      name: product.name,
+      image: product.images[0]?.imageUrl ?? "",
+      price: product.price,
+      quantity: 1,
+      size: selectedSize,
+      color: selectedColor.name,
+    });
 
-export default function ProductPage() {
-  const [selectedImage, setSelectedImage] = useState(images[0]);
-  const [selectedSize, setSelectedSize] = useState("M");
-  const [selectedColor, setSelectedColor] = useState(colors[0]);
+    toast.success("Product added to cart.");
+  };
 
   return (
     <section className="py-12">
@@ -52,7 +67,7 @@ export default function ProductPage() {
             href: "/shop",
           },
           {
-            label:  "Product Name",
+            label: product?.name || "",
           },
         ]}
       />
@@ -62,16 +77,18 @@ export default function ProductPage() {
         <div className="flex flex-col-reverse gap-4 md:flex-row">
           {/* Gallery */}
           <div className="flex gap-3 overflow-x-auto md:flex-col md:overflow-visible">
-            {images.map((image) => (
+            {product?.images.map((image) => (
               <button
-                //key={image.id}
-                onClick={() => setSelectedImage(image)}
+                key={image.id}
+                onClick={() => setSelectedImage(image.imageUrl)}
                 className={`shrink-0 overflow-hidden rounded-xl border-2 transition ${
-                  selectedImage === image ? "border-primary" : "border-border"
+                  selectedImage === image.imageUrl
+                    ? "border-primary"
+                    : "border-border"
                 }`}
               >
                 <Image
-                  src={image}
+                  src={image.imageUrl}
                   alt="Product"
                   width={90}
                   height={110}
@@ -92,27 +109,28 @@ export default function ProductPage() {
             />
           </div>
         </div>
+
         {/* Details */}
         <div className="lg:sticky lg:top-24 lg:h-fit">
-          <h1 className="text-3xl font-bold sm:text-4xl">{"product?.name"}</h1>
+          <h1 className="text-3xl font-bold sm:text-4xl">{product?.name}</h1>
 
 
           <h2 className="mt-6 text-2xl font-bold sm:text-3xl">
-            ${"product?.price.toFixed(2)"}
+            ${product?.price.toFixed(2)}
           </h2>
 
           <p
             className={`mt-2 font-medium ${
-              true ? "text-red-600" : "text-green-600"
+              isOutOfStock ? "text-red-600" : "text-green-600"
             }`}
           >
-            {true
+            {isOutOfStock
               ? "Out of Stock"
-              : `In Stock (${"product?.stock"} available)`}
+              : `In Stock (${product?.stock} available)`}
           </p>
 
           <p className="mt-6 leading-8 text-muted-foreground">
-            {"product?.description"}
+            {product?.description}
           </p>
 
           {/* Sizes */}
@@ -120,17 +138,17 @@ export default function ProductPage() {
             <p className="mb-3 font-semibold">Select Size</p>
 
             <div className="flex flex-wrap gap-3">
-              {sizes.map((size) => (
+              {product?.sizes.map((size) => (
                 <button
-                  //key={size.id}
-                  onClick={() => setSelectedSize(size)}
+                  key={size.id}
+                  onClick={() => setSelectedSize(size.size)}
                   className={`flex h-11 w-11 items-center justify-center rounded-lg border font-medium transition ${
-                    selectedSize === size
+                    selectedSize === size.size
                       ? "border-primary bg-primary text-primary-foreground"
                       : "border-border hover:border-primary"
                   }`}
                 >
-                  {size}
+                  {size.size}
                 </button>
               ))}
             </div>
@@ -141,13 +159,13 @@ export default function ProductPage() {
             <p className="mb-3 font-semibold">Select Color</p>
 
             <div className="flex gap-3">
-              {colors.map((color) => (
+              {product?.colors.map((color) => (
                 <button
                   key={color.name}
                   title={color.name}
                   onClick={() => setSelectedColor(color)}
                   className={`flex h-11 w-11 items-center justify-center rounded-full border transition ${
-                    selectedColor
+                    selectedColor?.id === color.id
                       ? "border-primary ring-2 ring-primary ring-offset-2"
                       : "border-border"
                   }`}
@@ -179,8 +197,8 @@ export default function ProductPage() {
           {/* Buttons */}
           <div className="mt-8">
             <Button
-             // onClick={handleAddToCart}
-              //disabled={isOutOfStock}    
+              onClick={handleAddToCart}
+              disabled={isOutOfStock}    
               className="w-full sm:w-fit"
               paddingX="px-20"
               leftIcon={<IoBagAddOutline size={20} />}
@@ -212,8 +230,6 @@ export default function ProductPage() {
             </div>
           </div>
         </div>
-
-
       </div>
     </section>
   );
