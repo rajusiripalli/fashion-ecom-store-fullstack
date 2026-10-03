@@ -1,10 +1,12 @@
-// import { OrderStatus } from "@/generated/prisma/enums";
+import { OrderStatus } from "@/generated/prisma/enums";
 
-// interface OrderStatusBadgeProps {
-//   status: OrderStatus;
-// }
+interface OrderStatusBadgeProps {
+  status: OrderStatus;
+}
 
-export default function OrderStatusBadge() {
+export default function OrderStatusBadge({
+  status,
+}: OrderStatusBadgeProps) {
   const styles = {
     DELIVERED:
       "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400",
@@ -20,13 +22,13 @@ export default function OrderStatusBadge() {
 
     SHIPPED:
       "bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-400",
-  } 
+  } satisfies Record<OrderStatus, string>;
 
   return (
     <span
-      className={`rounded-full px-3 py-1 text-xs font-medium ${styles["DELIVERED"]}`}
+      className={`rounded-full px-3 py-1 text-xs font-medium ${styles[status]}`}
     >
-      {"DELIVERED"}
+      {status}
     </span>
   );
 }

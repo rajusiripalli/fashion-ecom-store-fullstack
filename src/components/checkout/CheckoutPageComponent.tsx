@@ -1,16 +1,27 @@
-"use client"
+"use client";
 
-import FrontendLayout from "@/components/layouts/FrontendLayout";
+import { useState } from "react";
+import Image from "next/image";
+import { FaMoneyBillWave, FaStripe } from "react-icons/fa6";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Breadcrumb from "@/components/ui/Breadcrumb";
+
 import Button from "@/components/ui/Button";
-import Image from "next/image";
-import { FaMoneyBillWave, FaStripe } from "react-icons/fa";
 import Input from "@/components/ui/Input";
-import { useState } from "react";
+import FrontendLayout from "@/components/layouts/FrontendLayout";
+import Breadcrumb from "@/components/ui/Breadcrumb";
+import { getProfile } from "@/server-actions/user/getProfile";
+import { useCartStore } from "@/store/cart-store";
+import toast from "react-hot-toast";
+import { placeOrder } from "@/server-actions/orders/placeOrder";
+import { PaymentMethod } from "@/generated/prisma/enums";
 import { useRouter } from "next/navigation";
+import { createStripeCheckoutSession } from "@/server-actions/orders/createStripeCheckoutSession";
+
+interface CheckoutPageComponentProps {
+  user: Awaited<ReturnType<typeof getProfile>>;
+}
 
 const checkoutSchema = z.object({
   firstname: z.string().min(2, "First name must be at least 2 characters."),
@@ -32,39 +43,111 @@ const checkoutSchema = z.object({
 
 type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 
+export default function CheckoutPageComponent({
+  user,
+}: CheckoutPageComponentProps) {
+  const address = user?.addresses[0];
+  const { cartItems, subtotal, clearCart } = useCartStore();
 
-export default function CheckoutPageComponent() {
-     const router  = useRouter();
-     const [paymentMethod, setPaymentMethod] = useState<"cod" | "stripe">("cod");
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "stripe">("cod");
+  const router = useRouter();
 
-       const {
+  const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
-      firstname:  "",
-      lastname:  "",
-      email:  "",
-      phone:  "",
-      state: "",
-      city:  "",
-      street:  "",
-      country:  "",
+      firstname: address?.firstName ?? "",
+      lastname: address?.lastName ?? "",
+      email: user?.email ?? "",
+      phone: user?.phone ?? "",
+      state: address?.state ?? "",
+      city: address?.city ?? "",
+      street: address?.street ?? "",
+      country: address?.country ?? "",
     },
   });
 
-    const onSubmit = async (data: CheckoutFormValues) => {
-        console.log({
-            ...data,
-            paymentMethod
-        })
+  const onSubmit = async (data: CheckoutFormValues) => {
+    if (paymentMethod === "cod") {
+      const result = await placeOrder({
+        paymentMethod: PaymentMethod.CASH_ON_DELIVERY,
+
+        shippingAddress: {
+          firstName: data.firstname,
+          lastName: data.lastname,
+          phone: data.phone,
+          street: data.street,
+          city: data.city,
+          state: data.state,
+          country: data.country,
+        },
+
+        cartItems: cartItems.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          size: item.size,
+          color: item.color,
+        })),
+      });
+
+      if (!result.success) {
+        toast.error(result.message as string);
+        return;
+      }
+
+      toast.success("Order placed successfully.");
+
+      clearCart();
+
+      router.push(`/account/orders/${result?.orderNumber}`);
+      return;
     }
+
+    // stripe checkout
+    const result = await createStripeCheckoutSession({
+      shippingAddress: {
+        firstName: data.firstname,
+        lastName: data.lastname,
+        phone: data.phone,
+        street: data.street,
+        city: data.city,
+        state: data.state,
+        country: data.country,
+      },
+
+      cartItems: cartItems.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        size: item.size,
+        color: item.color,
+      })),
+    });
+
+    if (!result.success) {
+      toast.error(result.message as string);
+      return;
+    }
+
+    if (!result.url) {
+      toast.error("Unable to start Stripe checkout.");
+      return;
+    }
+
+    router.push(result.url);
+  };
+
+  const shipping = 0;
+  const tax = subtotal() * 0.05;
+  const total = subtotal() + shipping + tax;
+
+ 
 
   return (
     <FrontendLayout>
-            <section className="mx-auto max-w-7xl py-12">
+      <section className="mx-auto max-w-7xl py-12">
         <div className="mb-10">
           <Breadcrumb
             items={[
@@ -78,6 +161,7 @@ export default function CheckoutPageComponent() {
             Complete your order securely.
           </p>
         </div>
+
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="grid gap-10 lg:grid-cols-[2fr_1fr]"
@@ -92,50 +176,50 @@ export default function CheckoutPageComponent() {
                 <Input
                   label="First Name"
                   placeholder="John"
-                  //error={errors.firstname?.message}
-                  //{...register("firstname")}
+                  error={errors.firstname?.message}
+                  {...register("firstname")}
                 />
 
                 <Input
                   label="Last Name"
                   placeholder="Doe"
-                  //error={errors.lastname?.message}
-                  //{...register("lastname")}
+                  error={errors.lastname?.message}
+                  {...register("lastname")}
                 />
 
                 <Input
                   label="Email"
                   type="email"
                   placeholder="john@example.com"
-                  //error={errors.email?.message}
-                  //{...register("email")}
+                  error={errors.email?.message}
+                  {...register("email")}
                 />
 
                 <Input
                   label="Phone Number"
                   placeholder="+234..."
-                 // error={errors.phone?.message}
-                  //{...register("phone")}
+                  error={errors.phone?.message}
+                  {...register("phone")}
                 />
                 <Input
                   label="Country"
                   placeholder="Country"
-                 // error={errors.country?.message}
-                  //{...register("country")}
+                  error={errors.country?.message}
+                  {...register("country")}
                 />
 
                 <Input
                   label="State"
                   placeholder="Lagos"
-                  //error={errors.state?.message}
-                  //{...register("state")}
+                  error={errors.state?.message}
+                  {...register("state")}
                 />
 
                 <Input
                   label="City"
                   placeholder="Ikeja"
-                //  error={errors.city?.message}
-                  //{...register("city")}
+                  error={errors.city?.message}
+                  {...register("city")}
                 />
 
                 <div className="md:col-span-2">
@@ -143,8 +227,8 @@ export default function CheckoutPageComponent() {
                     variant="textarea"
                     label="Street Address"
                     placeholder="15 Admiralty Way"
-                    //error={errors.street?.message}
-                   // {...register("street")}
+                    error={errors.street?.message}
+                    {...register("street")}
                   />
                 </div>
               </div>
@@ -167,7 +251,7 @@ export default function CheckoutPageComponent() {
                   <div className="flex items-center gap-4">
                     <div
                       className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
-                       paymentMethod === "cod"
+                        paymentMethod === "cod"
                           ? "border-primary"
                           : "border-border"
                       }`}
@@ -230,7 +314,7 @@ export default function CheckoutPageComponent() {
                 </p>
 
                 <p className="mt-1 font-semibold">
-                  Stripe
+                  {paymentMethod === "cod" ? "Cash on Delivery" : "Stripe"}
                 </p>
               </div>
             </div>
@@ -241,27 +325,27 @@ export default function CheckoutPageComponent() {
             <h2 className="text-2xl font-bold">Order Summary</h2>
 
             <div className="mt-6 space-y-5">
-              {Array(2).fill(0).map((item, index) => (
-                <div key={index} className="flex gap-4">
-                    <Image
-                      src="/images/product1.png"
-                      alt="Product"
-                      width={70}
-                      height={85}
-                      className="rounded-lg"
-                    />
+              {cartItems.map((item) => (
+                <div key={item.cartKey} className="flex gap-4">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    width={70}
+                    height={85}
+                    className="rounded-lg"
+                  />
 
                   <div className="flex flex-1 justify-between">
                     <div>
                       <p className="font-medium">{item.name}</p>
 
                       <p className="text-sm text-muted-foreground">
-                        Qty: 2
+                        Qty: {item.quantity}
                       </p>
                     </div>
 
                     <p className="font-semibold">
-                      1000 x 2
+                      ${(item.price * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -271,7 +355,7 @@ export default function CheckoutPageComponent() {
             <div className="mt-8 space-y-4 border-t border-border pt-6">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>1999</span>
+                <span>${subtotal().toFixed(2)}</span>
               </div>
 
               <div className="flex justify-between">
@@ -281,12 +365,12 @@ export default function CheckoutPageComponent() {
 
               <div className="flex justify-between">
                 <span>Tax</span>
-                <span>195</span>
+                <span>${tax.toFixed(2)}</span>
               </div>
 
               <div className="flex justify-between border-t border-border pt-4 text-xl font-bold">
                 <span>Total</span>
-                <span>2000</span>
+                <span>${total.toFixed(2)}</span>
               </div>
             </div>
 
@@ -294,13 +378,13 @@ export default function CheckoutPageComponent() {
               type="submit"
               fullWidth
               className="mt-8"
-              //disabled={isSubmitting}
+              disabled={isSubmitting}
             >
-             
-                   { paymentMethod === "stripe"
+              {isSubmitting
+                ? "Processing..."
+                : paymentMethod === "stripe"
                   ? "Continue to Stripe"
                   : "Place Order"}
-               
             </Button>
 
             <p className="mt-4 text-center text-xs text-muted-foreground">
@@ -308,7 +392,7 @@ export default function CheckoutPageComponent() {
             </p>
           </aside>
         </form>
-        </section>
+      </section>
     </FrontendLayout>
-  )
+  );
 }

@@ -2,8 +2,8 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 
 
-//import { getAdminOrder } from "@/server-actions/orders/getAdminOrder";
-//import OrderStatusCard from "@/components/orders/orderStatusCard";
+import { getAdminOrder } from "@/server-actions/orders/getAdminOrder";
+import OrderStatusCard from "@/components/orders/orderStatusCard";
 
 interface OrderDetailsPageProps {
   params: Promise<{
@@ -11,55 +11,31 @@ interface OrderDetailsPageProps {
   }>;
 }
 
- const orders = [
-    {
-        id: "12345",
-        name: "Classic Jean Jacket",
-        image: "/images/product1.png",
-        totalItems: 3,
-        totalPrice: 259.97,
-        date: "July 27, 2026",
-        status: "Delivered",
-        paymentStatus:"Piad",
-    },
-    {
-        id: "123456",
-        name: "Modern Stock Jeans",
-        image: "/images/product2.png",
-        totalItems: 1,
-        totalPrice: 79.99,
-        date: "July 21, 2026",
-        status: "Processing",
-        paymentStatus:"COD",
-    }
-]
-
-
 
 export default async function OrderDetailsPage({
   params,
 }: OrderDetailsPageProps) {
   const { orderId } = await params;
 
-  //const order = await getAdminOrder(Number(orderId));
+  const order = await getAdminOrder(Number(orderId));
 
-//   if (!order) {
-//     notFound();
-//   }
+  if (!order) {
+    notFound();
+  }
 
   return (
     <section>
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">
-          Order {"order.orderNumber"}
+          Order {order.orderNumber}
         </h1>
 
         <p className="mt-2 text-muted-foreground">
           Placed on{" "}
-          {/* {new Intl.DateTimeFormat("en-US", {
+          {new Intl.DateTimeFormat("en-US", {
             dateStyle: "long",
-          }).format("2026-09-25T15:30:00.000Z")} */}
+          }).format(order.createdAt)}
         </p>
       </div>
 
@@ -76,21 +52,21 @@ export default async function OrderDetailsPage({
               <div>
                 <p className="text-sm text-muted-foreground">Name</p>
                 <p className="mt-1 font-medium">
-                  {"order.customer.name"}
+                  {order.customer.name}
                 </p>
               </div>
 
               <div>
                 <p className="text-sm text-muted-foreground">Email</p>
                 <p className="mt-1 font-medium">
-                  {"order.customer.email"}
+                  {order.customer.email}
                 </p>
               </div>
 
               <div>
                 <p className="text-sm text-muted-foreground">Phone</p>
                 <p className="mt-1 font-medium">
-                  {"order.address.phone"}
+                  {order.address.phone}
                 </p>
               </div>
 
@@ -100,11 +76,11 @@ export default async function OrderDetailsPage({
                 </p>
 
                 <p className="mt-1 font-medium">
-                  {"order.address.street"}
+                  {order.address.street}
                   <br />
-                  {"order.address.city"}, {"order.address.state"}
+                  {order.address.city}, {order.address.state}
                   <br />
-                  {"order.address.country"}
+                  {order.address.country}
                 </p>
               </div>
             </div>
@@ -119,7 +95,7 @@ export default async function OrderDetailsPage({
             </div>
 
             <div className="divide-y divide-border">
-              {orders.map((item) => (
+              {order.items.map((item) => (
                 <div
                   key={item.id}
                   className="flex items-center gap-5 p-6"
@@ -138,17 +114,16 @@ export default async function OrderDetailsPage({
                     </h3>
 
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Size: {"item.size"}
+                      Size: {item.size}
                     </p>
 
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Quantity: {"item.quantity"}
+                      Quantity: {item.quantity}
                     </p>
                   </div>
 
                   <div className="font-semibold">
-                    {/* ${(Number(item.price) * item.quantity).toFixed(2)} */}
-                    2000
+                    ${(Number(item.price) * item.quantity).toFixed(2)}
                   </div>
                 </div>
               ))}
@@ -159,7 +134,7 @@ export default async function OrderDetailsPage({
         {/* RIGHT */}
         <div className="space-y-8">
           {/* Status */}
-          {/* <OrderStatusCard orderId={order.id} status={order.status}/> */}
+          <OrderStatusCard orderId={order.id} status={order.status}/>
 
           {/* Summary */}
           <div className="rounded-2xl border border-border bg-background p-6">
@@ -173,7 +148,7 @@ export default async function OrderDetailsPage({
                   Subtotal
                 </span>
 
-                <span>${Number("order.subtotal").toFixed(2)}</span>
+                <span>${Number(order.subtotal).toFixed(2)}</span>
               </div>
 
               <div className="flex justify-between">
@@ -181,7 +156,7 @@ export default async function OrderDetailsPage({
                   Shipping
                 </span>
 
-                <span>${Number("order.shipping").toFixed(2)}</span>
+                <span>${Number(order.shipping).toFixed(2)}</span>
               </div>
 
               <div className="flex justify-between">
@@ -189,13 +164,13 @@ export default async function OrderDetailsPage({
                   Tax
                 </span>
 
-                <span>${Number("order.tax").toFixed(2)}</span>
+                <span>${Number(order.tax).toFixed(2)}</span>
               </div>
 
               <div className="flex justify-between border-t border-border pt-4 text-lg font-semibold">
                 <span>Total</span>
 
-                <span>${Number("order.total").toFixed(2)}</span>
+                <span>${Number(order.total).toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -211,7 +186,7 @@ export default async function OrderDetailsPage({
                 Method
               </span>
 
-              <span>{"order.paymentMethod"}</span>
+              <span>{order.paymentMethod}</span>
             </div>
 
             <div className="mt-3 flex items-center justify-between">
@@ -219,7 +194,7 @@ export default async function OrderDetailsPage({
                 Status
               </span>
 
-              <span>{"order.paymentStatus"}</span>
+              <span>{order.paymentStatus}</span>
             </div>
           </div>
         </div>

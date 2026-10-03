@@ -1,35 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
+
 import FrontendLayout from "@/components/layouts/FrontendLayout";
-import Breadcrumb from "@/components/ui/Breadcrumb";
 import Button from "@/components/ui/Button";
+import Breadcrumb from "@/components/ui/Breadcrumb";
+import { getOrders } from "@/server-actions/orders/getOrders";
 import { FiEye } from "react-icons/fi";
 import OrderStatusBadge from "@/components/ui/OrderStatusBadge";
 
+export const dynamic = "force-dynamic";
 
-const orders = [
-    {
-        id: "12345",
-        image: "/images/product1.png",
-        totalItems: 3,
-        totalPrice: 259.97,
-        date: "July 27, 2026",
-        status: "Delivered",
-    },
-    {
-        id: "123456",
-        image: "/images/product2.png",
-        totalItems: 1,
-        totalPrice: 79.99,
-        date: "July 21, 2026",
-        status: "Processing",
-    }
-]
+export default async function OrdersPage() {
+  const orders = await getOrders();
 
-export default function OrdersPage() {
   return (
     <FrontendLayout>
-        <section className="mx-auto max-w-6xl py-12">
+      <section className="mx-auto max-w-6xl py-12">
         <Breadcrumb
           items={[
             { label: "Home", href: "/" },
@@ -37,6 +23,7 @@ export default function OrdersPage() {
             { label: "Orders" },
           ]}
         />
+
         <p className="mt-2 text-muted-foreground">
           View and track your recent purchases.
         </p>
@@ -71,10 +58,10 @@ export default function OrdersPage() {
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-3">
                     <h2 className="text-lg font-semibold">
-                      Order #{"order.orderNumber"}
+                      Order #{order.orderNumber}
                     </h2>
 
-                   <OrderStatusBadge />
+                   <OrderStatusBadge status={order.status}/>
                   </div>
 
                   <div className="mt-5 grid grid-cols-2 gap-5 text-sm md:grid-cols-3">
@@ -90,28 +77,28 @@ export default function OrdersPage() {
                       <p className="text-muted-foreground">Total Price</p>
 
                       <p className="mt-1 font-semibold">
-                        ${"order.total.toFixed(2)"}
+                        ${order.total.toFixed(2)}
                       </p>
                     </div>
 
                     <div>
                       <p className="text-muted-foreground">Order Date</p>
 
-                      {/* <p className="mt-1 font-semibold">
+                      <p className="mt-1 font-semibold">
                         {new Intl.DateTimeFormat("en-US", {
                           dateStyle: "medium",
                         }).format(order.createdAt)}
-                      </p> */}
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                <Link href={`/account/orders/${order.id}`}>
+                <Link href={`/account/orders/${order.orderNumber}`}>
                
                         <button className="rounded-lg p-4 transition bg-surface cursor-pointer">
                           <FiEye />
                         </button>
-                </Link>
+                      </Link>
                 
               </div>
             ))}

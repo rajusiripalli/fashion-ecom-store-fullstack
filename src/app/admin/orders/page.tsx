@@ -1,32 +1,12 @@
 import Link from "next/link";
 import { FiEye } from "react-icons/fi";
 
-//import { getAllOrders } from "@/server-actions/orders/getAllOrders";
+import { getAllOrders } from "@/server-actions/orders/getAllOrders";
 import OrderStatusBadge from "@/components/ui/OrderStatusBadge";
 
- const orders = [
-    {
-        id: "12345",
-        image: "/images/product1.png",
-        totalItems: 3,
-        totalPrice: 259.97,
-        date: "July 27, 2026",
-        status: "Delivered",
-        paymentStatus:"Piad",
-    },
-    {
-        id: "123456",
-        image: "/images/product2.png",
-        totalItems: 1,
-        totalPrice: 79.99,
-        date: "July 21, 2026",
-        status: "Processing",
-        paymentStatus:"COD",
-    }
-]
 
 export default async function AdminOrdersPage() {
-
+  const orders = await getAllOrders();
 
   return (
     <section>
@@ -88,17 +68,17 @@ export default async function AdminOrdersPage() {
                   <td className="px-6 py-5">
                     <div>
                       <p className="font-medium">
-                        {order.id}
+                        {order.orderNumber}
                       </p>
 
                       <p className="text-sm text-muted-foreground">
-                        {"order.createdAt.toLocaleDateString()"}
+                        {order.createdAt.toLocaleDateString()}
                       </p>
                     </div>
                   </td>
 
                   <td className="px-6 py-5">
-                    {"order.customer"}
+                    {order.customer}
                   </td>
 
                   <td className="px-6 py-5">
@@ -106,7 +86,7 @@ export default async function AdminOrdersPage() {
                   </td>
 
                   <td className="px-6 py-5 font-medium">
-                    ${"order.total.toFixed(2)"}
+                    ${order.total.toFixed(2)}
                   </td>
 
                   <td className="px-6 py-5">
@@ -128,7 +108,7 @@ export default async function AdminOrdersPage() {
                   </td>
 
                   <td className="px-6 py-5">
-                    {order.date}
+                    {order.createdAt.toLocaleDateString()}
                   </td>
 
                   <td className="px-6 py-5">
